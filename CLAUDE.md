@@ -14,12 +14,12 @@ El objetivo es construir una aplicación full stack pequeña pero profesional qu
 - Backend: Node.js + Express en `/backend` (puerto 3001)
 - Frontend: React 18 + Vite + TailwindCSS en `/frontend` (puerto 5173)
 - Validación backend: Zod
-- LLM: Anthropic Claude vía `@anthropic-ai/sdk`
+- LLM: Google Gemini vía `@google/generative-ai`
 - Infra: Docker + Docker Compose
 
 ## LLM
-- Modelo: `claude-sonnet-4-20250514`
-- Max tokens: 512 para análisis de comentarios
+- Modelo: `gemini-1.5-flash`
+- Max tokens: no aplica (Gemini no requiere límite explícito)
 
 ## Estructura esperada
 - `/backend` → API Express
@@ -61,7 +61,7 @@ Valores válidos para `sentiment`: `positive`, `neutral`, `negative`
 ## Variables de entorno
 
 **Backend:**
-- `LLM_API_KEY` → API key de Anthropic
+- `LLM_API_KEY` → API key de Google Gemini
 - `PORT` → puerto backend, default 3001
 
 **Frontend:**
