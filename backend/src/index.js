@@ -1,0 +1,19 @@
+require('dotenv').config();
+
+const express = require('express');
+const postsRouter = require('./routes/posts');
+const aiRouter = require('./routes/ai');
+
+const app = express();
+
+app.use(express.json());
+
+app.use('/posts', postsRouter);
+app.use('/ai', aiRouter);
+
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`Backend running on port ${PORT}`);
+});
+
+module.exports = app;
