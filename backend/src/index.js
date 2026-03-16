@@ -11,6 +11,12 @@ app.use(express.json());
 app.use('/posts', postsRouter);
 app.use('/ai', aiRouter);
 
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
+  console.error('[express]', err);
+  res.status(500).json({ error: 'Internal server error' });
+});
+
 if (require.main === module) {
   const PORT = process.env.PORT || 3001;
   app.listen(PORT, () => {
