@@ -82,6 +82,7 @@ export default function App() {
                 analyzing={analyzing}
                 analysis={analysis}
                 error={analysisError}
+                disabled={posts.length === 0}
               />
             </div>
           </>

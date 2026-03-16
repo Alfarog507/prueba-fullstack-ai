@@ -4,13 +4,13 @@ const SENTIMENT_STYLES = {
   negative: 'bg-red-100 text-red-700',
 };
 
-export default function AIAnalysis({ onAnalyze, analyzing, analysis, error }) {
+export default function AIAnalysis({ onAnalyze, analyzing, analysis, error, disabled }) {
   return (
     <div>
       <button
         onClick={onAnalyze}
-        disabled={analyzing}
-        className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-medium py-2 px-4 rounded-md transition-colors"
+        disabled={analyzing || disabled}
+        className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium py-2 px-4 rounded-md transition-colors"
       >
         {analyzing ? 'Analizando...' : 'Analizar comentarios con IA'}
       </button>
