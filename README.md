@@ -5,65 +5,42 @@ Aplicación full stack que consume datos de una API externa, los procesa mediant
 ## Tech Stack
 
 **Backend**
-- Node.js + Express
-- Integración con LLM (OpenAI / Anthropic / Gemini / Groq)
+- Node.js + Express (puerto 3001)
+- Google Gemini `gemini-2.5-flash` vía `@google/generative-ai`
+- Validación de inputs con Zod
 
 **Frontend**
-- React 18 (o Vue 3)
+- React 18 + Vite (puerto 5173)
 - TailwindCSS
-- Programación funcional (Hooks / Composition API)
+- Programación funcional con Hooks
 
 **Infraestructura**
 - Docker + Docker Compose
 
-## Estructura del Proyecto
-
-```
-/backend
-  ├── Dockerfile
-  ├── src/
-  └── ...
-
-/frontend
-  ├── Dockerfile
-  ├── src/
-  └── ...
-
-docker-compose.yml
-.dockerignore
-README.md
-```
-
 ## Requisitos Previos
 
 - [Docker](https://www.docker.com/) y Docker Compose instalados
-- API Key de un proveedor de LLM (OpenAI, Anthropic, Gemini, Groq, etc.)
+- API Key de Google Gemini
 
 ## Instalación y Ejecución
 
 ### Con Docker (recomendado)
 
-1. Clonar el repositorio:
-   ```bash
-   git clone <url-del-repositorio>
-   cd prueba-fullstack-ai
-   ```
+```bash
+git clone <url-del-repositorio>
+cd prueba-fullstack-ai
+cp .env.example .env      # completar con tu API key
+docker compose up --build
+```
 
-2. Crear el archivo `.env` en la raíz del proyecto (o en `/backend`) con las variables de entorno necesarias:
-   ```env
-   LLM_API_KEY=tu_api_key_aqui
-   ```
-
-3. Levantar los servicios:
-   ```bash
-   docker compose up
-   ```
+La app queda disponible en `http://localhost:5173`.
 
 ### Sin Docker
 
 **Backend:**
 ```bash
 cd backend
+cp .env.example .env      # completar con tu API key
 npm install
 npm start
 ```
@@ -75,49 +52,53 @@ npm install
 npm run dev
 ```
 
+## Variables de Entorno
+
+Crear un archivo `.env` en la raíz (para Docker) o en `/backend` (sin Docker):
+
+```env
+LLM_API_KEY=your_gemini_api_key_here
+PORT=3001                  # opcional, default 3001
+```
+
 ## API Endpoints
 
 ### `GET /posts`
 
-Consume los datos de la API externa, agrupa los comentarios por nombre de usuario y cuenta cuántos tiene cada uno.
+Consume `https://jsonplaceholder.typicode.com/comments`, agrupa por `name` y devuelve el resultado ordenado de mayor a menor.
 
 **Respuesta:**
 ```json
 [
-  { "name": "Pedro Gonzalez", "postCount": 10 },
-  { "name": "Fabricio Perez", "postCount": 8 }
+  { "name": "Leanne Graham", "postCount": 5 },
+  { "name": "Ervin Howell", "postCount": 3 }
 ]
 ```
 
-**Errores:**
-- `500` — Fallo al consumir la API externa.
+**Errores:** `500` si falla la API externa.
 
 ---
 
 ### `POST /ai/analyze-comments`
 
-Recibe una lista de comentarios, los envía a un LLM y devuelve un análisis automático con resumen y sentimiento general.
+Recibe una lista de textos, los analiza con Gemini y devuelve un resumen y sentimiento general.
 
 **Body:**
 ```json
-{
-  "comments": ["comentario 1", "comentario 2", "..."]
-}
+{ "comments": ["comentario 1", "comentario 2"] }
 ```
 
 **Respuesta:**
 ```json
 {
-  "summary": "Los usuarios comentan principalmente sobre el sistema y la experiencia de uso.",
+  "summary": "Los usuarios comentan principalmente sobre el sistema.",
   "sentiment": "neutral"
 }
 ```
 
-## Frontend
+Valores válidos para `sentiment`: `positive`, `neutral`, `negative`.
 
-- **Vista principal:** Tabla con columnas *Usuario* y *Cantidad de Posts*.
-- **Búsqueda:** Campo de texto para filtrar por nombre de usuario.
-- **Análisis con IA:** Botón "Analizar comentarios con IA" que envía los comentarios al endpoint de análisis y muestra el resumen y sentimiento generados.
+**Errores:** `400` si el body es inválido, `500` si falla el LLM.
 
 ## Tests
 
@@ -125,6 +106,8 @@ Recibe una lista de comentarios, los envía a un LLM y devuelve un análisis aut
 cd backend
 npm test
 ```
+
+17 tests distribuidos en 4 suites: servicios (`postsService`, `aiService`) y rutas (`GET /posts`, `POST /ai/analyze-comments`).
 
 ## Funcionalidades Opcionales
 
@@ -137,21 +120,24 @@ npm test
 
 ### Herramientas utilizadas
 
-<!-- Completar con las herramientas que uses -->
-- Ejemplo: Claude Code, GitHub Copilot, ChatGPT, Cursor, etc.
+- Claude Code (CLI de Anthropic)
 
 ### Tareas en las que ayudaron
 
-<!-- Completar -->
-- Generación de código
-- Debugging
-- Tests
-- Documentación
+- Generación del esqueleto completo del proyecto (backend, frontend, Docker)
+- Escritura de tests con Jest y Supertest
+- Configuración de Vite proxy y Nginx para producción
+- Debugging y ajustes de integración entre capas
 
 ### Ejemplos de prompts utilizados
 
-<!-- Completar con prompts reales que hayas usado -->
+```
+"Before writing any code, read every file in the project (backend and frontend),
+then create a detailed plan that includes what's already implemented, what needs
+to be created from scratch, what needs to be modified, and the exact order to
+implement everything, session by session."
+```
 
 ```
-Ejemplo: "Genera un endpoint en Express que consuma la API de posts y agrupe los comentarios por usuario."
+"go ahead with session 1"
 ```
