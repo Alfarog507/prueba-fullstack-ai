@@ -29,7 +29,7 @@ Aplicación full stack que consume datos de una API externa, los procesa mediant
 ```bash
 git clone <url-del-repositorio>
 cd prueba-fullstack-ai
-cp .env.example .env      # completar con tu API key
+cp .env.example .env      # API key
 docker compose up --build
 ```
 
@@ -40,7 +40,7 @@ La app queda disponible en `http://localhost:5173`.
 **Backend:**
 ```bash
 cd backend
-cp .env.example .env      # completar con tu API key
+cp .env.example .env      # API key
 npm install
 npm start
 ```
