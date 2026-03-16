@@ -1,4 +1,4 @@
-jest.mock('../clients/geminiClient');
+jest.mock('../clients/geminiClient', () => ({}));
 
 const geminiClient = require('../clients/geminiClient');
 const { analyzeComments } = require('../services/aiService');
