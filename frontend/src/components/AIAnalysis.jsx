@@ -4,7 +4,7 @@ const SENTIMENT_STYLES = {
   negative: 'bg-red-100 text-red-700',
 };
 
-export default function AIAnalysis({ onAnalyze, analyzing, analysis, error, disabled }) {
+export default function AIAnalysis({ onAnalyze, analyzing, streamingText, analysis, error, disabled }) {
   return (
     <div>
       <button
@@ -17,6 +17,13 @@ export default function AIAnalysis({ onAnalyze, analyzing, analysis, error, disa
 
       {error && (
         <p className="mt-3 text-red-500 text-sm text-center">{error}</p>
+      )}
+
+      {streamingText && !analysis && (
+        <div className="mt-4 p-4 bg-white rounded-lg border border-gray-200 font-mono text-sm text-gray-500 whitespace-pre-wrap break-all">
+          {streamingText}
+          <span className="animate-pulse">▊</span>
+        </div>
       )}
 
       {analysis && (

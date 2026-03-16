@@ -1,15 +1,17 @@
 jest.mock('../clients/geminiClient', () => ({}));
 
 const geminiClient = require('../clients/geminiClient');
-const { analyzeComments } = require('../services/aiService');
+const { analyzeComments, streamAnalyzeComments } = require('../services/aiService');
 
 const mockText = jest.fn();
 const mockGenerateContent = jest.fn();
+const mockGenerateContentStream = jest.fn();
 
 beforeEach(() => {
   jest.clearAllMocks();
   geminiClient.getGenerativeModel = jest.fn().mockReturnValue({
     generateContent: mockGenerateContent,
+    generateContentStream: mockGenerateContentStream,
   });
   mockGenerateContent.mockResolvedValue({ response: { text: mockText } });
 });
@@ -43,5 +45,38 @@ describe('analyzeComments', () => {
   it('throws when generateContent rejects', async () => {
     mockGenerateContent.mockRejectedValue(new Error('API quota exceeded'));
     await expect(analyzeComments(['comentario'])).rejects.toThrow('API quota exceeded');
+  });
+});
+
+describe('streamAnalyzeComments', () => {
+  async function* fakeStream(chunks) {
+    for (const text of chunks) yield { text: () => text };
+  }
+
+  it('yields chunk events and a final done event with parsed result', async () => {
+    mockGenerateContentStream.mockResolvedValue({
+      stream: fakeStream(['{"summary":"ok"', ',"sentiment":"positive","categories":["sugerencia"]}'])
+    });
+
+    const events = [];
+    for await (const event of streamAnalyzeComments(['comentario'])) {
+      events.push(event);
+    }
+
+    const chunks = events.filter(e => e.type === 'chunk');
+    const done = events.find(e => e.type === 'done');
+
+    expect(chunks.length).toBe(2);
+    expect(done.result).toEqual({ summary: 'ok', sentiment: 'positive', categories: ['sugerencia'] });
+  });
+
+  it('throws when accumulated text is not valid JSON', async () => {
+    mockGenerateContentStream.mockResolvedValue({
+      stream: fakeStream(['no es json'])
+    });
+
+    const gen = streamAnalyzeComments(['comentario']);
+    await gen.next(); // chunk event
+    await expect(gen.next()).rejects.toThrow(); // done event tries to parse → throws
   });
 });

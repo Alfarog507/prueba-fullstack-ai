@@ -27,4 +27,22 @@ async function analyzeComments(comments) {
   return parseResponse(result.response.text());
 }
 
-module.exports = { analyzeComments };
+async function* streamAnalyzeComments(comments) {
+  const model = genAI.getGenerativeModel({
+    model: 'gemini-2.5-flash',
+    systemInstruction: SYSTEM_PROMPT,
+  });
+
+  const { stream } = await model.generateContentStream(buildUserMessage(comments));
+  let fullText = '';
+
+  for await (const chunk of stream) {
+    const text = chunk.text();
+    fullText += text;
+    yield { type: 'chunk', text };
+  }
+
+  yield { type: 'done', result: parseResponse(fullText) };
+}
+
+module.exports = { analyzeComments, streamAnalyzeComments };

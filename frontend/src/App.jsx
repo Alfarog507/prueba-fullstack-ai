@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getPosts, analyzeComments } from './api/client';
+import { getPosts, streamAnalyzeComments } from './api/client';
 import SearchBar from './components/SearchBar';
 import PostsTable from './components/PostsTable';
 import Pagination from './components/Pagination';
@@ -14,6 +14,7 @@ export default function App() {
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [analyzing, setAnalyzing] = useState(false);
+  const [streamingText, setStreamingText] = useState('');
   const [analysis, setAnalysis] = useState(null);
   const [analysisError, setAnalysisError] = useState(null);
 
@@ -39,15 +40,21 @@ export default function App() {
   async function handleAnalyze() {
     setAnalyzing(true);
     setAnalysis(null);
+    setStreamingText('');
     setAnalysisError(null);
     try {
       const comments = posts.flatMap(p => p.bodies).slice(0, 20);
-      const result = await analyzeComments(comments);
-      setAnalysis(result);
+      await streamAnalyzeComments(
+        comments,
+        (chunk) => setStreamingText(prev => prev + chunk),
+        (result) => setAnalysis(result),
+        (message) => setAnalysisError(message),
+      );
     } catch {
       setAnalysisError('No se pudo completar el análisis.');
     } finally {
       setAnalyzing(false);
+      setStreamingText('');
     }
   }
 
@@ -80,6 +87,7 @@ export default function App() {
               <AIAnalysis
                 onAnalyze={handleAnalyze}
                 analyzing={analyzing}
+                streamingText={streamingText}
                 analysis={analysis}
                 error={analysisError}
                 disabled={posts.length === 0}
