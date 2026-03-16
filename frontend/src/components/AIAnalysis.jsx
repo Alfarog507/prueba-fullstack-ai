@@ -22,11 +22,21 @@ export default function AIAnalysis({ onAnalyze, analyzing, analysis, error, disa
       {analysis && (
         <div className="mt-4 p-4 bg-white rounded-lg border border-gray-200">
           <p className="text-gray-700 text-sm mb-3">{analysis.summary}</p>
-          <span
-            className={`inline-block text-xs font-semibold px-2 py-1 rounded-full ${SENTIMENT_STYLES[analysis.sentiment] ?? 'bg-gray-100 text-gray-600'}`}
-          >
-            {analysis.sentiment}
-          </span>
+          <div className="flex flex-wrap gap-2">
+            <span
+              className={`text-xs font-semibold px-2 py-1 rounded-full ${SENTIMENT_STYLES[analysis.sentiment] ?? 'bg-gray-100 text-gray-600'}`}
+            >
+              {analysis.sentiment}
+            </span>
+            {analysis.categories?.map(cat => (
+              <span
+                key={cat}
+                className="text-xs font-medium px-2 py-1 rounded-full bg-blue-50 text-blue-700"
+              >
+                {cat}
+              </span>
+            ))}
+          </div>
         </div>
       )}
     </div>

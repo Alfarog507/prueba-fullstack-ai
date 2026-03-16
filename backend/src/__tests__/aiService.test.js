@@ -15,20 +15,20 @@ beforeEach(() => {
 });
 
 describe('analyzeComments', () => {
-  it('returns parsed summary and sentiment from clean JSON', async () => {
-    mockText.mockReturnValue('{"summary":"todo bien","sentiment":"positive"}');
+  it('returns parsed summary, sentiment and categories from clean JSON', async () => {
+    mockText.mockReturnValue('{"summary":"todo bien","sentiment":"positive","categories":["soporte"]}');
     const result = await analyzeComments(['comentario 1', 'comentario 2']);
-    expect(result).toEqual({ summary: 'todo bien', sentiment: 'positive' });
+    expect(result).toEqual({ summary: 'todo bien', sentiment: 'positive', categories: ['soporte'] });
   });
 
-  it('strips markdown code fences if LLM wraps response in them', async () => {
-    mockText.mockReturnValue('```json\n{"summary":"ok","sentiment":"neutral"}\n```');
+  it('defaults categories to [] when missing from LLM response', async () => {
+    mockText.mockReturnValue('{"summary":"ok","sentiment":"neutral"}');
     const result = await analyzeComments(['comentario']);
-    expect(result).toEqual({ summary: 'ok', sentiment: 'neutral' });
+    expect(result).toEqual({ summary: 'ok', sentiment: 'neutral', categories: [] });
   });
 
   it('calls getGenerativeModel with correct model name', async () => {
-    mockText.mockReturnValue('{"summary":"x","sentiment":"negative"}');
+    mockText.mockReturnValue('{"summary":"x","sentiment":"negative","categories":[]}');
     await analyzeComments(['c']);
     expect(geminiClient.getGenerativeModel).toHaveBeenCalledWith(
       expect.objectContaining({ model: 'gemini-2.5-flash' })
